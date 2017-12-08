@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraController : MonoBehaviour
+public class CameraChaser : MonoBehaviour
 {
     [SerializeField]
     Transform target;
@@ -16,5 +16,6 @@ public class CameraController : MonoBehaviour
     void LateUpdate()
     {
         transform.position = target.position + target.right * offset.x + target.up * offset.y;
+        transform.rotation = Quaternion.LookRotation(target.position - transform.position + target.transform.up);
     }
 }

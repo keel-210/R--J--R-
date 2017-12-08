@@ -10,6 +10,8 @@ public class PlayerController : MonoBehaviour
     float JumpPower;
     [SerializeField]
     LayerMask mask;
+    [SerializeField]
+    SimpleAnimation ani;
 
     bool OnGround;
     int IsTouching;
@@ -26,6 +28,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetAxisRaw("Jump") > 0 && OnGround)
         {
             rb.AddForce(Vector3.up * JumpPower);
+            //ani.CrossFade("Jump", 0.5f);
             WallRunRelease();
         }
     }
@@ -49,6 +52,8 @@ public class PlayerController : MonoBehaviour
         rb.velocity = new Vector3(0, 0, 0);
         IsTouching++;
 
+        ani.CrossFade("Run", 0.5f);
+
         Mesurement(collision);
         Debug.Log("run" + Normal);
         WallRunning();
@@ -69,6 +74,7 @@ public class PlayerController : MonoBehaviour
         if (OnGround && IsTouching <= 0)
         {
             WallRunRelease();
+            ani.CrossFade("InAir", 0.5f);
         }
     }
     private Vector3 MesureNormal(Transform tra, Collision collision)
@@ -80,20 +86,27 @@ public class PlayerController : MonoBehaviour
         if (Physics.Raycast(tra.position, contact - transform.position, out hit, 5f, mask))
         {
             centerPos = hit.point;
-            if (Physics.Raycast(tra.position - tra.right * 0.5f, contact - tra.position, out hit, 5f, mask))
-            {
-                BackPos = hit.point;
-                if (Physics.Raycast(tra.position + tra.up * 0.5f, contact - tra.position, out hit, 5f, mask))
-                {
-                    UpPos = hit.point;
-
-                    Vector3 dir1 = BackPos - centerPos;
-                    Vector3 dir2 = UpPos - centerPos;
-                    normal = Vector3.Cross(dir2, dir1).normalized;
-                }
-            }
         }
-        if ((normal == Vector3.zero) || (normal == Vector3.down))
+        if (Physics.Raycast(tra.position - tra.right * 0.5f, contact - tra.position, out hit, 5f, mask))
+        {
+            BackPos = hit.point;
+        }
+        if (Physics.Raycast(tra.position + tra.up * 0.5f, contact - tra.position, out hit, 5f, mask))
+        {
+            UpPos = hit.point;
+        }
+
+        Vector3 dir1 = BackPos - centerPos;
+        Vector3 dir2 = UpPos - centerPos;
+        if (dir1 != Vector3.zero || dir2 != Vector3.zero)
+        {
+            normal = Vector3.Cross(dir2, dir1).normalized;
+        }
+        if (normal.y < 0 && (contact.y - tra.position.y) < 0)
+        {
+            normal = Vector3.Cross(dir1, dir2).normalized;
+        }
+        if (normal == Vector3.zero)
         {
             normal = Vector3.up;
         }
@@ -149,5 +162,6 @@ public class PlayerController : MonoBehaviour
         Normal = Vector3.zero;
         IsTouching = 0;
         Debug.Log("Release");
+        ani.CrossFade("InAir", 0.5f);
     }
 }
