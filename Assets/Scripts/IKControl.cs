@@ -4,7 +4,6 @@ using System.Collections;
 
 public class IKControl : MonoBehaviour
 {
-
     protected Animator animator;
 
     public bool ikActive = false;

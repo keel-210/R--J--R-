@@ -10,6 +10,12 @@ public class PlayerController : MonoBehaviour
     float JumpPower;
     [SerializeField]
     LayerMask mask;
+    [SerializeField]
+    Animator ani;
+    [SerializeField]
+    IKControl iK;
+    [SerializeField]
+    Transform ArmIKPos;
 
     bool OnGround;
     int IsTouching;
@@ -28,6 +34,7 @@ public class PlayerController : MonoBehaviour
             rb.AddForce(Vector3.up * JumpPower);
             WallRunRelease();
         }
+        ani.SetBool("OnGround", OnGround);
     }
     private void FixedUpdate()
     {
@@ -49,19 +56,22 @@ public class PlayerController : MonoBehaviour
         rb.velocity = new Vector3(0, 0, 0);
         IsTouching++;
 
-        Mesurement(collision);
+        Mesure(collision);
         Debug.Log("run" + Normal);
         WallRunning();
     }
     private void OnCollisionStay(Collision collision)
     {
         OnGround = true;
-
-        Mesurement(collision);
+        Mesure(collision);
 
         WallRunning();
+
+        ArmIKPos.position = Mesurement.RayContactPoint(transform.position + new Vector3(0, 0.65f, 0), -Normal, mask);
+
         Debug.DrawLine(collision.contacts[0].point, transform.position, Color.green);
         Debug.DrawRay(transform.position, Normal, Color.yellow);
+        Debug.DrawRay(transform.position + new Vector3(0, 0.65f, 0), -Normal, Color.magenta);
     }
     private void OnCollisionExit(Collision collision)
     {
@@ -71,88 +81,27 @@ public class PlayerController : MonoBehaviour
             WallRunRelease();
         }
     }
-    private Vector3 MesureNormal(Transform tra, Collision collision)
+
+    void Mesure(Collision collision)
     {
-        Vector3 normal = Vector3.up;
-        Vector3 centerPos = Vector3.zero, UpPos = Vector3.zero, BackPos = Vector3.zero;
-        Vector3 contact = collision.contacts[collision.contacts.Length - 1].point;
-        RaycastHit hit;
-        if (Physics.Raycast(tra.position, contact - transform.position, out hit, 5f, mask))
-        {
-            centerPos = hit.point;
-        }
-        if (Physics.Raycast(tra.position - tra.right * 0.5f, contact - tra.position, out hit, 5f, mask))
-        {
-            BackPos = hit.point;
-        }
-        if (Physics.Raycast(tra.position + tra.up * 0.5f, contact - tra.position, out hit, 5f, mask))
-        {
-            UpPos = hit.point;
-        }
-
-        Vector3 dir1 = BackPos - centerPos;
-        Vector3 dir2 = UpPos - centerPos;
-        if (dir1 != Vector3.zero || dir2 != Vector3.zero)
-        {
-            normal = Vector3.Cross(dir2, dir1).normalized;
-        }
-        if (normal.y < 0 && (contact.y - tra.position.y) < 0)
-        {
-            normal = Vector3.Cross(dir1, dir2).normalized;
-        }
-        if (normal == Vector3.zero)
-        {
-            normal = Vector3.up;
-        }
-        return normal;
-    }
-    private Vector3 MesureDirection(Transform tra, Collision collision)
-    {
-        Vector3 dir = tra.right;
-        Vector3 centerPos = Vector3.zero, BackPos = Vector3.zero, ForwardPos = Vector3.zero;
-        Vector3 contact = collision.contacts[collision.contacts.Length - 1].point;
-        RaycastHit hit;
-        if (Physics.Raycast(tra.position, contact - tra.position, out hit, 5f, mask))
-        {
-            centerPos = hit.point;
-
-            if (Physics.Raycast(tra.position - tra.right * 0.5f, contact - tra.position, out hit, 5f, mask))
-            {
-                BackPos = hit.point;
-
-                if (Physics.Raycast(tra.position + tra.right * 0.5f, contact - tra.position, out hit, 5f, mask))
-                {
-                    ForwardPos = hit.point;
-                    Vector3 dir1 = centerPos - BackPos;
-                    Vector3 dir2 = ForwardPos - centerPos;
-                    dir = ((dir1 + dir2) * 0.5f).normalized;
-                    dir = new Vector3(dir.x, 0, dir.z).normalized;
-
-                    Debug.DrawRay(tra.position, contact - tra.position, Color.green);
-                    Debug.DrawRay(tra.position - new Vector3(0.5f, 0, 0), contact - tra.position, Color.green);
-                    Debug.DrawRay(tra.position + new Vector3(0.5f, 0, 0), contact - tra.position, Color.green);
-
-                    Debug.DrawRay(transform.position, dir * 5, Color.red);
-                }
-            }
-        }
-        return dir;
-    }
-    void Mesurement(Collision collision)
-    {
-        Normal = MesureNormal(transform, collision);
-        MeshDirection = MesureDirection(transform, collision);
+        Normal = Mesurement.MesureNormal(transform, collision, mask);
+        MeshDirection = Mesurement.MesureDirection(transform, collision, mask);
     }
     void WallRunning()
     {
         transform.right = MeshDirection;
         rb.velocity = transform.right * velo.x;
         rb.AddForce(-Normal * 100, ForceMode.Acceleration);
+        if (Normal != Vector3.up)
+        {
+            iK.ikActive = true;
+        }
     }
     void WallRunRelease()
     {
         OnGround = false;
         rb.useGravity = true;
+        iK.ikActive = false;
         Normal = Vector3.zero;
         IsTouching = 0;
         Debug.Log("Release");
