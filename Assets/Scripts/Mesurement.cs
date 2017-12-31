@@ -39,36 +39,37 @@ public class Mesurement
         }
         return normal;
     }
-    static public Vector3 MesureDirection(Transform tra, Collision collision, LayerMask mask)
+    static public Vector3 MesureDirection(Transform tra, Collision collision, LayerMask mask, Vector3 direction)
     {
         Vector3 dir = tra.right;
         Vector3 centerPos = Vector3.zero, BackPos = Vector3.zero, ForwardPos = Vector3.zero;
         Vector3 contact = collision.contacts[collision.contacts.Length - 1].point;
         RaycastHit hit;
-        if (Physics.Raycast(tra.position, contact - tra.position, out hit, 5f, mask))
+        if (Physics.Raycast(tra.position, direction, out hit, 5f, mask))
         {
             centerPos = hit.point;
-
-            if (Physics.Raycast(tra.position - tra.right * 0.5f, contact - tra.position, out hit, 5f, mask))
-            {
-                BackPos = hit.point;
-
-                if (Physics.Raycast(tra.position + tra.right * 0.5f, contact - tra.position, out hit, 5f, mask))
-                {
-                    ForwardPos = hit.point;
-                    Vector3 dir1 = centerPos - BackPos;
-                    Vector3 dir2 = ForwardPos - centerPos;
-                    dir = ((dir1 + dir2) * 0.5f).normalized;
-                    dir = new Vector3(dir.x, 0, dir.z).normalized;
-
-                    Debug.DrawRay(tra.position, contact - tra.position, Color.green);
-                    Debug.DrawRay(tra.position - new Vector3(0.5f, 0, 0), contact - tra.position, Color.green);
-                    Debug.DrawRay(tra.position + new Vector3(0.5f, 0, 0), contact - tra.position, Color.green);
-
-                    Debug.DrawRay(tra.position, dir * 5, Color.red);
-                }
-            }
         }
+        if (Physics.Raycast(tra.position - tra.right * 0.5f, direction, out hit, 5f, mask))
+        {
+            BackPos = hit.point;
+        }
+        if (Physics.Raycast(tra.position + tra.right * 0.5f, direction, out hit, 5f, mask))
+        {
+            ForwardPos = hit.point;
+        }
+        if (centerPos != Vector3.zero && BackPos != Vector3.zero && ForwardPos != Vector3.zero)
+        {
+            Vector3 dir1 = centerPos - BackPos;
+            Vector3 dir2 = ForwardPos - centerPos;
+            dir = ((dir1 + dir2) * 0.5f).normalized;
+            dir = new Vector3(dir.x, 0, dir.z).normalized;
+        }
+
+        Debug.DrawRay(tra.position, direction, Color.cyan);
+        Debug.DrawRay(tra.position - tra.right * 0.5f, direction, Color.cyan);
+        Debug.DrawRay(tra.position + tra.right * 0.5f, direction, Color.cyan);
+
+        Debug.DrawRay(tra.position, dir * 5, Color.red);
         return dir;
     }
     static public Vector3 RayContactPoint(Vector3 start, Vector3 dir, LayerMask mask)
