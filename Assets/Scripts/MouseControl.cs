@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class PlayerController : MonoBehaviour
+public class MouseControl : MonoBehaviour
 {
     Vector3 AirVelo, FallVelo;
     Animator ani;
@@ -11,8 +11,7 @@ public class PlayerController : MonoBehaviour
     Transform UC_Model;
     GameObject LandingEffect, JumpEffect;
     [SerializeField]
-    bool EnableDoubleJump, EnableAirDash, EnableFall;
-    bool IsAirDashing;
+    bool EnableDoubleJump, EnableAirDash, IsAirDashing;
 
     Rigidbody rb;
     WallRunner wallr;
@@ -32,6 +31,14 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+
+    }
+    private void FixedUpdate()
+    {
+        if (rb.useGravity)
+        {
+            InAirByMouse();
+        }
         if (Input.GetAxisRaw("Vertical") < 0 && !wallr.OnGround)
         {
             Fall();
@@ -49,16 +56,9 @@ public class PlayerController : MonoBehaviour
             StartCoroutine(AirDash(1f));
         ani.SetBool("OnGround", wallr.OnGround);
     }
-    private void FixedUpdate()
+    void InAirByMouse()
     {
-        if (rb.useGravity)
-        {
-            InAirAction();
-        }
-    }
-    void InAirAction()
-    {
-        rb.velocity = transform.right * AirVelo.x
+        rb.velocity = transform.right * AirVelo.x * Input.GetAxis("Vertical")
                         + new Vector3(0, rb.velocity.y, 0)
                             - transform.forward * AirVelo.z * Input.GetAxis("Horizontal");
     }

@@ -42,32 +42,41 @@ public class Mesurement
     static public Vector3 MesureDirection(Transform tra, Collision collision, LayerMask mask, Vector3 direction)
     {
         Vector3 dir = tra.right;
-        Vector3 centerPos = Vector3.zero, BackPos = Vector3.zero, ForwardPos = Vector3.zero;
+        Vector3 Pos1 = Vector3.zero, Pos2 = Vector3.zero, Pos3 = Vector3.zero, Pos4 = Vector3.zero;
         Vector3 contact = collision.contacts[collision.contacts.Length - 1].point;
         RaycastHit hit;
-        if (Physics.Raycast(tra.position, direction, out hit, 5f, mask))
+        Vector3 right = tra.right * 0.25f;
+        Vector3 forward = tra.up * 0.25f;
+        if (Physics.Raycast(tra.position + right + forward, direction, out hit, 5f, mask))
         {
-            centerPos = hit.point;
+            Pos1 = hit.point;
         }
-        if (Physics.Raycast(tra.position - tra.right * 0.5f, direction, out hit, 5f, mask))
+        if (Physics.Raycast(tra.position + right - forward, direction, out hit, 5f, mask))
         {
-            BackPos = hit.point;
+            Pos2 = hit.point;
         }
-        if (Physics.Raycast(tra.position + tra.right * 0.5f, direction, out hit, 5f, mask))
+        if (Physics.Raycast(tra.position - right - forward, direction, out hit, 5f, mask))
         {
-            ForwardPos = hit.point;
+            Pos3 = hit.point;
         }
-        if (centerPos != Vector3.zero && BackPos != Vector3.zero && ForwardPos != Vector3.zero)
+        if (Physics.Raycast(tra.position - right + forward, direction, out hit, 5f, mask))
         {
-            Vector3 dir1 = centerPos - BackPos;
-            Vector3 dir2 = ForwardPos - centerPos;
-            dir = ((dir1 + dir2) * 0.5f).normalized;
+            Pos4 = hit.point;
+        }
+        if (Pos1 != Vector3.zero && Pos2 != Vector3.zero && Pos3 != Vector3.zero && Pos4 != Vector3.zero)
+        {
+            Vector3 dir1 = Pos1 - Pos4;
+            Vector3 dir2 = Pos2 - Pos3;
+            Vector3 dir3 = Pos1 - Pos3;
+            Vector3 dir4 = Pos2 - Pos4;
+            dir = (dir1 + dir2 + dir3 + dir4).normalized;
             dir = new Vector3(dir.x, 0, dir.z).normalized;
         }
 
-        Debug.DrawRay(tra.position, direction, Color.cyan);
-        Debug.DrawRay(tra.position - tra.right * 0.5f, direction, Color.cyan);
-        Debug.DrawRay(tra.position + tra.right * 0.5f, direction, Color.cyan);
+        Debug.DrawRay(tra.position + right + forward, direction, Color.cyan);
+        Debug.DrawRay(tra.position + right - forward, direction, Color.cyan);
+        Debug.DrawRay(tra.position - right - forward, direction, Color.cyan);
+        Debug.DrawRay(tra.position - right + forward, direction, Color.cyan);
 
         Debug.DrawRay(tra.position, dir * 5, Color.red);
         return dir;
