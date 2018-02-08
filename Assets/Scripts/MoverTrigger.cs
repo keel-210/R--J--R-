@@ -13,7 +13,6 @@ public class MoverTrigger : MonoBehaviour
     }
     void OnTriggerEnter()
     {
-        Debug.Log("run");
         StartCoroutine(this.DelayMethod(FireTime, () =>
          { mover.IsActivate = true; }
         ));

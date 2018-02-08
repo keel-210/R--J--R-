@@ -45,38 +45,44 @@ public class Mesurement
         Vector3 Pos1 = Vector3.zero, Pos2 = Vector3.zero, Pos3 = Vector3.zero, Pos4 = Vector3.zero;
         Vector3 contact = collision.contacts[collision.contacts.Length - 1].point;
         RaycastHit hit;
+        Vector3 Offset1 = Vector3.Cross(tra.right, direction).normalized * 0.25f;
+        Debug.DrawRay(tra.position, Offset1, Color.magenta);
         Vector3 right = tra.right * 0.25f;
-        Vector3 forward = tra.up * 0.25f;
-        if (Physics.Raycast(tra.position + right + forward, direction, out hit, 5f, mask))
+        Vector3 forward = tra.forward * 0.25f;
+        if (Physics.Raycast(tra.position + Offset1 + right, direction, out hit, 5f, mask))
         {
             Pos1 = hit.point;
         }
-        if (Physics.Raycast(tra.position + right - forward, direction, out hit, 5f, mask))
+        if (Physics.Raycast(tra.position + Offset1 - right, direction, out hit, 5f, mask))
         {
             Pos2 = hit.point;
         }
-        if (Physics.Raycast(tra.position - right - forward, direction, out hit, 5f, mask))
+        if (Physics.Raycast(tra.position - Offset1 + right, direction, out hit, 5f, mask))
         {
             Pos3 = hit.point;
         }
-        if (Physics.Raycast(tra.position - right + forward, direction, out hit, 5f, mask))
+        if (Physics.Raycast(tra.position - Offset1 - right, direction, out hit, 5f, mask))
         {
             Pos4 = hit.point;
         }
         if (Pos1 != Vector3.zero && Pos2 != Vector3.zero && Pos3 != Vector3.zero && Pos4 != Vector3.zero)
         {
-            Vector3 dir1 = Pos1 - Pos4;
-            Vector3 dir2 = Pos2 - Pos3;
-            Vector3 dir3 = Pos1 - Pos3;
-            Vector3 dir4 = Pos2 - Pos4;
+            Vector3 dir1 = Pos1 - Pos2;
+            Vector3 dir2 = Pos3 - Pos2;
+            Vector3 dir3 = Pos1 - Pos4;
+            Vector3 dir4 = Pos3 - Pos4;
             dir = (dir1 + dir2 + dir3 + dir4).normalized;
             dir = new Vector3(dir.x, 0, dir.z).normalized;
         }
+        else
+        {
+            Debug.Log("Direction Mesurement Error");
+        }
 
-        Debug.DrawRay(tra.position + right + forward, direction, Color.cyan);
-        Debug.DrawRay(tra.position + right - forward, direction, Color.cyan);
-        Debug.DrawRay(tra.position - right - forward, direction, Color.cyan);
-        Debug.DrawRay(tra.position - right + forward, direction, Color.cyan);
+        Debug.DrawRay(tra.position + Offset1 + right, direction, Color.cyan);
+        Debug.DrawRay(tra.position + Offset1 - right, direction, Color.cyan);
+        Debug.DrawRay(tra.position - Offset1 - right, direction, Color.cyan);
+        Debug.DrawRay(tra.position - Offset1 + right, direction, Color.cyan);
 
         Debug.DrawRay(tra.position, dir * 5, Color.red);
         return dir;

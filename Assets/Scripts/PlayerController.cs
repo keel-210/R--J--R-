@@ -45,8 +45,7 @@ public class PlayerController : MonoBehaviour
             if (!IsAirDashing)
                 StartCoroutine(AirDash(1f));
         }
-        if (IsAirDashing)
-            StartCoroutine(AirDash(1f));
+
         ani.SetBool("OnGround", wallr.OnGround);
     }
     private void FixedUpdate()
@@ -55,10 +54,12 @@ public class PlayerController : MonoBehaviour
         {
             InAirAction();
         }
+        if (IsAirDashing)
+            StartCoroutine(AirDash(1f));
     }
     void InAirAction()
     {
-        rb.velocity = transform.right * AirVelo.x
+        rb.velocity = transform.right * AirVelo.x * Input.GetAxis("Vertical")
                         + new Vector3(0, rb.velocity.y, 0)
                             - transform.forward * AirVelo.z * Input.GetAxis("Horizontal");
     }
@@ -72,8 +73,7 @@ public class PlayerController : MonoBehaviour
     }
     IEnumerator AirDash(float time)
     {
-        rb.velocity = transform.right * AirVelo.x * 2
-                        - transform.forward * AirVelo.z;
+        rb.velocity = transform.right * AirVelo.x * 2;
         IsAirDashing = true;
         yield return new WaitForSeconds(time);
         IsAirDashing = false;

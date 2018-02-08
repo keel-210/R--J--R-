@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class WallRunner : MonoBehaviour
+public class MouseWallRunner : MonoBehaviour
 {
     Vector3 velo;
     float JumpPower;
@@ -11,7 +11,9 @@ public class WallRunner : MonoBehaviour
     public bool OnGround;
     int IsTouching;
     Rigidbody rb;
-    Vector3 Normal, MeshDirection;
+    public Vector3 Normal, MeshDirection;
+    [SerializeField]
+    MouseDirection mouseDir;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -59,23 +61,26 @@ public class WallRunner : MonoBehaviour
     }
     void WallRunning(Collision collision)
     {
-        transform.right = MeshDirection;
-        rb.velocity = transform.right * velo.x * Input.GetAxis("Vertical");
-        rb.AddForce(-Normal * 100, ForceMode.Acceleration);
-        if (Normal != Vector3.up)
+        if (Normal == Vector3.up)
         {
-            Vector3 upDir = Vector3.Cross(transform.right, Normal).normalized;
+            transform.right = collision.transform.right;
+            transform.localRotation *= mouseDir.GetXDir();
+            Vector3 LerpedRight = new Vector3(transform.right.x, 0, transform.right.z).normalized;
+            Vector3 LerpedForward = new Vector3(transform.forward.x, 0, transform.forward.z);
+            rb.velocity = LerpedRight * velo.x * Input.GetAxis("Vertical")
+                                - LerpedForward * velo.z * Input.GetAxis("Horizontal");
         }
         else
         {
-            transform.right = collision.transform.right;
+            transform.right = MeshDirection;
+            rb.velocity = transform.right * velo.x * Input.GetAxis("Vertical");
         }
+        rb.AddForce(-Normal * 100, ForceMode.Acceleration);
     }
     void WallRunRelease()
     {
         OnGround = false;
         rb.useGravity = true;
-        Normal = Vector3.zero;
         IsTouching = 0;
     }
 }

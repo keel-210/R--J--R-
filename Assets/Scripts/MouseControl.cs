@@ -14,11 +14,14 @@ public class MouseControl : MonoBehaviour
     bool EnableDoubleJump, EnableAirDash, IsAirDashing;
 
     Rigidbody rb;
-    WallRunner wallr;
+    MouseWallRunner wallr;
+    [SerializeField]
+    MouseDirection mouseDir;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        wallr = GetComponent<WallRunner>();
+        wallr = GetComponent<MouseWallRunner>();
         PlayerParamater PP = GetComponent<PlayerParamater>();
         AirVelo = PP.AirVelo;
         FallVelo = PP.FallVelo;
@@ -29,15 +32,11 @@ public class MouseControl : MonoBehaviour
         UC_Model.transform.localRotation = Quaternion.Slerp(UC_Model.transform.localRotation, Quaternion.Euler(0, 90, 0), 0.05f);
     }
 
-    void Update()
-    {
-
-    }
     private void FixedUpdate()
     {
         if (rb.useGravity)
         {
-            InAirByMouse();
+            InAirAction();
         }
         if (Input.GetAxisRaw("Vertical") < 0 && !wallr.OnGround)
         {
@@ -56,11 +55,23 @@ public class MouseControl : MonoBehaviour
             StartCoroutine(AirDash(1f));
         ani.SetBool("OnGround", wallr.OnGround);
     }
-    void InAirByMouse()
+    void InAirAction()
     {
-        rb.velocity = transform.right * AirVelo.x * Input.GetAxis("Vertical")
+        if (wallr.Normal != Vector3.up)
+        {
+            transform.right = wallr.MeshDirection;
+            transform.localRotation *= mouseDir.GetDir();
+        }
+        else
+        {
+
+            transform.localRotation = mouseDir.GetDir();
+        }
+        Vector3 LerpedRight = new Vector3(transform.right.x, 0, transform.right.z).normalized;
+        Vector3 LerpedForward = new Vector3(transform.forward.x, 0, transform.forward.z);
+        rb.velocity = LerpedRight * AirVelo.x * Input.GetAxis("Vertical")
                         + new Vector3(0, rb.velocity.y, 0)
-                            - transform.forward * AirVelo.z * Input.GetAxis("Horizontal");
+                            - LerpedForward * AirVelo.z * Input.GetAxis("Horizontal");
     }
     void Fall()
     {
@@ -72,8 +83,7 @@ public class MouseControl : MonoBehaviour
     }
     IEnumerator AirDash(float time)
     {
-        rb.velocity = transform.right * AirVelo.x * 2
-                        - transform.forward * AirVelo.z;
+        rb.velocity = transform.right * AirVelo.x * 2;
         IsAirDashing = true;
         yield return new WaitForSeconds(time);
         IsAirDashing = false;
