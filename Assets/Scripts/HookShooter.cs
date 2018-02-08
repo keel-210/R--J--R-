@@ -4,18 +4,24 @@ using UnityEngine;
 
 public class HookShooter : MonoBehaviour
 {
-
+    [SerializeField]
+    Rigidbody rigidbody;
+    float PullingSpeed;
     bool IsHooked;
-    void Start()
-    {
-
-    }
+    Vector3 HookedPoint, PullingVelo;
 
     void Update()
     {
         if (Input.GetAxis("Fire2") > 0)
         {
-            Hook();
+            if (!IsHooked)
+            {
+                Hook();
+            }
+            else
+            {
+                Pull();
+            }
         }
         else if (IsHooked)
         {
@@ -24,10 +30,21 @@ public class HookShooter : MonoBehaviour
     }
     void Hook()
     {
-
+        IsHooked = true;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit = new RaycastHit();
+        if (Physics.Raycast(ray, out hit, 30f))
+        {
+            HookedPoint = hit.point;
+            PullingVelo = (HookedPoint - transform.position).normalized;
+        }
+    }
+    void Pull()
+    {
+        rigidbody.AddForce(PullingVelo * PullingSpeed);
     }
     void HookRelease()
     {
-
+        IsHooked = false;
     }
 }
