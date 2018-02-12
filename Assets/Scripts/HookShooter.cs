@@ -6,21 +6,27 @@ public class HookShooter : MonoBehaviour
 {
     [SerializeField]
     Rigidbody rigidbody;
+    [SerializeField]
     float PullingSpeed;
-    bool IsHooked;
+    [SerializeField]
+    LayerMask mask;
+    public bool IsHooked;
     Vector3 HookedPoint, PullingVelo;
 
     void Update()
     {
         if (Input.GetAxis("Fire2") > 0)
         {
-            if (!IsHooked)
+            if (rigidbody.useGravity)
             {
-                Hook();
-            }
-            else
-            {
-                Pull();
+                if (!IsHooked)
+                {
+                    Hook();
+                }
+                else
+                {
+                    Pull();
+                }
             }
         }
         else if (IsHooked)
@@ -33,18 +39,27 @@ public class HookShooter : MonoBehaviour
         IsHooked = true;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit = new RaycastHit();
-        if (Physics.Raycast(ray, out hit, 30f))
+        if (Physics.Raycast(ray, out hit, 500f, mask))
         {
             HookedPoint = hit.point;
-            PullingVelo = (HookedPoint - transform.position).normalized;
+        }
+        else
+        {
+            IsHooked = false;
         }
     }
     void Pull()
     {
-        rigidbody.AddForce(PullingVelo * PullingSpeed);
+        if (HookedPoint != Vector3.zero)
+        {
+            PullingVelo = (HookedPoint - transform.position).normalized;
+            rigidbody.AddForce(PullingVelo * PullingSpeed);
+            Debug.DrawLine(transform.position, HookedPoint, Color.blue);
+        }
     }
     void HookRelease()
     {
         IsHooked = false;
+        HookedPoint = Vector3.zero;
     }
 }

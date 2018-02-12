@@ -76,7 +76,7 @@ public class Mesurement
         }
         else
         {
-            Debug.Log("Direction Mesurement Error");
+            Debug.Log("Direction Mesurement Error" + direction + collision.gameObject.name);
         }
 
         Debug.DrawRay(tra.position + Offset1 + right, direction, Color.cyan);

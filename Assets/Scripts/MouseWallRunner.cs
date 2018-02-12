@@ -14,10 +14,11 @@ public class MouseWallRunner : MonoBehaviour
     public Vector3 Normal, MeshDirection;
     [SerializeField]
     MouseDirection mouseDir;
+    PlayerParamater PP;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        PlayerParamater PP = GetComponent<PlayerParamater>();
+        PP = GetComponent<PlayerParamater>();
         velo = PP.WallVelo;
         JumpPower = PP.JumpPower;
         mask = PP.mask;
@@ -65,15 +66,18 @@ public class MouseWallRunner : MonoBehaviour
         {
             transform.right = collision.transform.right;
             transform.localRotation *= mouseDir.GetXDir();
+            Debug.Log("mouse" + mouseDir.GetXDir().eulerAngles);
             Vector3 LerpedRight = new Vector3(transform.right.x, 0, transform.right.z).normalized;
             Vector3 LerpedForward = new Vector3(transform.forward.x, 0, transform.forward.z);
             rb.velocity = LerpedRight * velo.x * Input.GetAxis("Vertical")
                                 - LerpedForward * velo.z * Input.GetAxis("Horizontal");
+            PP.IsRunningPlane = true;
         }
         else
         {
             transform.right = MeshDirection;
             rb.velocity = transform.right * velo.x * Input.GetAxis("Vertical");
+            PP.IsRunningPlane = false;
         }
         rb.AddForce(-Normal * 100, ForceMode.Acceleration);
     }
@@ -82,5 +86,6 @@ public class MouseWallRunner : MonoBehaviour
         OnGround = false;
         rb.useGravity = true;
         IsTouching = 0;
+        PP.IsRunningPlane = false;
     }
 }

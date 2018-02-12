@@ -43,4 +43,15 @@ public class MouseDirection : MonoBehaviour
         xQuaternion = Quaternion.AngleAxis(rotAverageX, Vector3.up);
         return xQuaternion;
     }
+    public Quaternion GetYDir()
+    {
+        rotAverageY = 0f;
+
+        rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
+
+        rotAverageY = rotationY;
+
+        yQuaternion = Quaternion.AngleAxis(rotAverageY, Vector3.forward);
+        return yQuaternion;
+    }
 }

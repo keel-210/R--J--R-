@@ -11,4 +11,5 @@ public class PlayerParamater : MonoBehaviour
     public GameObject LandingEffect, JumpEffect;
     public float JumpPower;
     public LayerMask mask;
+    public bool IsRunningPlane;
 }

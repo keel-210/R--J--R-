@@ -17,11 +17,12 @@ public class MouseControl : MonoBehaviour
     MouseWallRunner wallr;
     [SerializeField]
     MouseDirection mouseDir;
-
+    HookShooter hookShooter;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         wallr = GetComponent<MouseWallRunner>();
+        hookShooter = GetComponent<HookShooter>();
         PlayerParamater PP = GetComponent<PlayerParamater>();
         AirVelo = PP.AirVelo;
         FallVelo = PP.FallVelo;
@@ -67,11 +68,14 @@ public class MouseControl : MonoBehaviour
 
             transform.localRotation = mouseDir.GetDir();
         }
-        Vector3 LerpedRight = new Vector3(transform.right.x, 0, transform.right.z).normalized;
-        Vector3 LerpedForward = new Vector3(transform.forward.x, 0, transform.forward.z);
-        rb.velocity = LerpedRight * AirVelo.x * Input.GetAxis("Vertical")
-                        + new Vector3(0, rb.velocity.y, 0)
-                            - LerpedForward * AirVelo.z * Input.GetAxis("Horizontal");
+        if (!hookShooter.IsHooked)
+        {
+            Vector3 LerpedRight = new Vector3(transform.right.x, 0, transform.right.z).normalized;
+            Vector3 LerpedForward = new Vector3(transform.forward.x, 0, transform.forward.z);
+            rb.velocity = LerpedRight * AirVelo.x * Input.GetAxis("Vertical")
+                            + new Vector3(0, rb.velocity.y, 0)
+                                - LerpedForward * AirVelo.z * Input.GetAxis("Horizontal");
+        }
     }
     void Fall()
     {
