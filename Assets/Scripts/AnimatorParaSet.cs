@@ -12,6 +12,9 @@ public class AnimatorParaSet : MonoBehaviour
 
     void Update()
     {
-        ani.SetFloat("Forward", Input.GetAxis("Vertical"));
+        ani.SetFloat("MoveX", Input.GetAxis("Vertical"));
+        ani.SetFloat("MoveY", Input.GetAxis("Horizontal"));
+        ani.SetFloat("AbsMoveX", Mathf.Abs(Input.GetAxis("Vertical")));
+        ani.SetFloat("AbsMoveY", Mathf.Abs(Input.GetAxis("Horizontal")));
     }
 }

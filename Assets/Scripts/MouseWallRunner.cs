@@ -66,17 +66,18 @@ public class MouseWallRunner : MonoBehaviour
         {
             transform.right = collision.transform.right;
             transform.localRotation *= mouseDir.GetXDir();
-            Debug.Log("mouse" + mouseDir.GetXDir().eulerAngles);
             Vector3 LerpedRight = new Vector3(transform.right.x, 0, transform.right.z).normalized;
             Vector3 LerpedForward = new Vector3(transform.forward.x, 0, transform.forward.z);
-            rb.velocity = LerpedRight * velo.x * Input.GetAxis("Vertical")
+            Vector3 ToVelo = LerpedRight * velo.x * Input.GetAxis("Vertical")
                                 - LerpedForward * velo.z * Input.GetAxis("Horizontal");
+            rb.velocity = Vector3.Lerp(rb.velocity, ToVelo, 0.25f);
             PP.IsRunningPlane = true;
         }
         else
         {
             transform.right = MeshDirection;
-            rb.velocity = transform.right * velo.x * Input.GetAxis("Vertical");
+            Vector3 ToVelo = transform.right * velo.x * Input.GetAxis("Vertical");
+            rb.velocity = Vector3.Lerp(rb.velocity, ToVelo, 0.25f);
             PP.IsRunningPlane = false;
         }
         rb.AddForce(-Normal * 100, ForceMode.Acceleration);

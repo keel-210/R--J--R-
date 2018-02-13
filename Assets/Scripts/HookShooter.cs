@@ -9,24 +9,35 @@ public class HookShooter : MonoBehaviour
     [SerializeField]
     float PullingSpeed;
     [SerializeField]
-    LayerMask mask;
-    public bool IsHooked;
+    GameObject HookShot;
+    public bool IsHooked, IsShotHook;
     Vector3 HookedPoint, PullingVelo;
-
+    LineRenderer line;
+    MouseDirection dir;
+    void Start()
+    {
+        dir = FindObjectOfType<MouseDirection>();
+        line = GetComponent<LineRenderer>();
+        line.enabled = false;
+    }
     void Update()
     {
         if (Input.GetAxis("Fire2") > 0)
         {
             if (rigidbody.useGravity)
             {
-                if (!IsHooked)
+                if (!IsShotHook)
                 {
                     Hook();
                 }
-                else
+                if (IsHooked)
                 {
                     Pull();
                 }
+            }
+            else
+            {
+                HookRelease();
             }
         }
         else if (IsHooked)
@@ -36,17 +47,21 @@ public class HookShooter : MonoBehaviour
     }
     void Hook()
     {
+        IsShotHook = true;
+        Instantiate(HookShot, transform.position, transform.localRotation * dir.GetDir());
+        StartCoroutine(this.DelayMethod(3f, () =>
+        {
+            if (!IsHooked)
+                IsShotHook = false;
+        }));
+    }
+    public void HookHit(Vector3 HitPoint)
+    {
         IsHooked = true;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit = new RaycastHit();
-        if (Physics.Raycast(ray, out hit, 500f, mask))
-        {
-            HookedPoint = hit.point;
-        }
-        else
-        {
-            IsHooked = false;
-        }
+        HookedPoint = HitPoint;
+        line.SetPosition(0, transform.position);
+        line.SetPosition(1, HookedPoint);
+        line.enabled = true;
     }
     void Pull()
     {
@@ -54,12 +69,15 @@ public class HookShooter : MonoBehaviour
         {
             PullingVelo = (HookedPoint - transform.position).normalized;
             rigidbody.AddForce(PullingVelo * PullingSpeed);
+            line.SetPosition(0, transform.position);
             Debug.DrawLine(transform.position, HookedPoint, Color.blue);
         }
     }
     void HookRelease()
     {
         IsHooked = false;
+        IsShotHook = false;
+        line.enabled = false;
         HookedPoint = Vector3.zero;
     }
 }

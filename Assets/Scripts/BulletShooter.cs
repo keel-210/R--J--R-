@@ -33,7 +33,7 @@ public class BulletShooter : MonoBehaviour
                 }
                 else
                 {
-                    GameObject bul = Instantiate(bullet, transform.position, transform.rotation);
+                    GameObject bul = Instantiate(bullet, transform.position, transform.rotation * dir.GetYDir());
                     bul.GetComponent<Rigidbody>().velocity = bul.transform.right * velo.x
                                                                 + bul.transform.up * velo.y
                                                                 + bul.transform.forward * velo.z;
