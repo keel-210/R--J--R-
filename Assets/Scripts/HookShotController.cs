@@ -19,5 +19,6 @@ public class HookShotController : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
         hookShooter.HookHit(collision.contacts[0].point);
+        Destroy(this.gameObject);
     }
 }

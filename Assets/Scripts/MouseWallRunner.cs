@@ -70,7 +70,7 @@ public class MouseWallRunner : MonoBehaviour
             Vector3 LerpedForward = new Vector3(transform.forward.x, 0, transform.forward.z);
             Vector3 ToVelo = LerpedRight * velo.x * Input.GetAxis("Vertical")
                                 - LerpedForward * velo.z * Input.GetAxis("Horizontal");
-            rb.velocity = Vector3.Lerp(rb.velocity, ToVelo, 0.25f);
+            rb.velocity = Vector3.Lerp(rb.velocity, ToVelo.normalized * 20.6f, 0.25f);
             PP.IsRunningPlane = true;
         }
         else

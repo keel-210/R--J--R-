@@ -48,7 +48,8 @@ public class HookShooter : MonoBehaviour
     void Hook()
     {
         IsShotHook = true;
-        Instantiate(HookShot, transform.position, transform.localRotation * dir.GetDir());
+        GameObject obj = Instantiate(HookShot, transform.position, Quaternion.identity);
+        obj.transform.right = Camera.main.ScreenPointToRay(Input.mousePosition).direction;
         StartCoroutine(this.DelayMethod(3f, () =>
         {
             if (!IsHooked)

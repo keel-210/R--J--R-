@@ -18,6 +18,7 @@ public class MouseControl : MonoBehaviour
     [SerializeField]
     MouseDirection mouseDir;
     HookShooter hookShooter;
+    bool HasJumpReleased;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
