@@ -59,14 +59,14 @@ public class MouseControl : MonoBehaviour
     }
     void InAirAction()
     {
-        if (wallr.Normal != Vector3.up)
+        if (wallr.Normal == Vector3.up)
         {
-            transform.right = wallr.MeshDirection;
+            transform.right = wallr.RightDir;
             transform.localRotation *= mouseDir.GetDir();
+            transform.localRotation *= Quaternion.Inverse(wallr.InAirMouseDir);
         }
         else
         {
-
             transform.localRotation = mouseDir.GetDir();
         }
         if (!hookShooter.IsHooked)

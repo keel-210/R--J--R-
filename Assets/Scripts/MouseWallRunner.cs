@@ -11,7 +11,8 @@ public class MouseWallRunner : MonoBehaviour
     public bool OnGround;
     int IsTouching;
     Rigidbody rb;
-    public Vector3 Normal, MeshDirection;
+    public Vector3 Normal, MeshDirection, RightDir;
+    public Quaternion InAirMouseDir;
     [SerializeField]
     MouseDirection mouseDir;
     PlayerParamater PP;
@@ -57,15 +58,18 @@ public class MouseWallRunner : MonoBehaviour
 
     void Mesure(Collision collision)
     {
-        Normal = Mesurement.MesureNormal(transform, collision, mask);
-        MeshDirection = Mesurement.MesureDirection(transform, collision, mask, -Normal);
+        if (!rb.useGravity)
+        {
+            Normal = Mesurement.MesureNormal(transform, collision, mask);
+            MeshDirection = Mesurement.MesureDirection(transform, collision, mask, -Normal);
+        }
     }
     void WallRunning(Collision collision)
     {
         if (Normal == Vector3.up)
         {
-            transform.right = collision.transform.right;
-            transform.localRotation *= mouseDir.GetXDir();
+            //transform.right = collision.transform.right;
+            transform.localRotation = mouseDir.GetXDir();
             Vector3 LerpedRight = new Vector3(transform.right.x, 0, transform.right.z).normalized;
             Vector3 LerpedForward = new Vector3(transform.forward.x, 0, transform.forward.z);
             Vector3 ToVelo = LerpedRight * velo.x * Input.GetAxis("Vertical")
@@ -88,5 +92,8 @@ public class MouseWallRunner : MonoBehaviour
         rb.useGravity = true;
         IsTouching = 0;
         PP.IsRunningPlane = false;
+        RightDir = transform.right;
+        InAirMouseDir = mouseDir.GetDir();
+        rb.AddForce(Normal * JumpPower);
     }
 }

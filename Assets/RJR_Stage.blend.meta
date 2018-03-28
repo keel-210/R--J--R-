@@ -43,6 +43,8 @@ ModelImporter:
     100074: Cube_029
     100076: Cube_030
     100078: Cube_031
+    100080: BezierCurve_004
+    100082: Cube_032
     400000: //RootNode
     400002: Cube
     400004: Plane
@@ -83,6 +85,8 @@ ModelImporter:
     400074: Cube_029
     400076: Cube_030
     400078: Cube_031
+    400080: BezierCurve_004
+    400082: Cube_032
     2100000: unnamed
     2100002: Material_001
     2100004: Material
@@ -127,6 +131,8 @@ ModelImporter:
     2300074: Cube_029
     2300076: Cube_030
     2300078: Cube_031
+    2300080: BezierCurve_004
+    2300082: Cube_032
     3300000: //RootNode
     3300002: Cube
     3300004: Plane
@@ -167,6 +173,8 @@ ModelImporter:
     3300074: Cube_029
     3300076: Cube_030
     3300078: Cube_031
+    3300080: BezierCurve_004
+    3300082: Cube_032
     4300000: Plane
     4300002: Cube
     4300004: Plane_001
@@ -206,6 +214,8 @@ ModelImporter:
     4300072: Cube_024
     4300074: Cube_023
     4300076: BezierCurve_003
+    4300078: Cube_032
+    4300080: BezierCurve_004
     7400000: Default Take
     9500000: //RootNode
   externalObjects: {}
