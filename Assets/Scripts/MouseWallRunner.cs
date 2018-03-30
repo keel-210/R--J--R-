@@ -26,7 +26,7 @@ public class MouseWallRunner : MonoBehaviour
     }
     void Update()
     {
-        if (Input.GetAxisRaw("Jump") > 0 && OnGround)
+        if ((Normal != Vector3.up && Input.GetAxisRaw("Horizontal") != 0) || (Input.GetAxisRaw("Jump") > 0 && OnGround))
         {
             rb.AddForce(Vector3.up * JumpPower);
             WallRunRelease();
@@ -60,7 +60,14 @@ public class MouseWallRunner : MonoBehaviour
     {
         if (!rb.useGravity)
         {
-            Normal = Mesurement.MesureNormal(transform, collision, mask);
+            if (Mesurement.MesureNormal(transform, collision, mask).sqrMagnitude == 1)
+            {
+                Normal = Mesurement.MesureNormal(transform, collision, mask);
+            }
+            if (Normal.y > 0.95f)
+            {
+                Normal = Vector3.up;
+            }
             MeshDirection = Mesurement.MesureDirection(transform, collision, mask, -Normal);
         }
     }
@@ -88,12 +95,15 @@ public class MouseWallRunner : MonoBehaviour
     }
     void WallRunRelease()
     {
-        OnGround = false;
-        rb.useGravity = true;
-        IsTouching = 0;
-        PP.IsRunningPlane = false;
-        RightDir = transform.right;
-        InAirMouseDir = mouseDir.GetDir();
-        rb.AddForce(Normal * JumpPower);
+        if (!rb.useGravity)
+        {
+            OnGround = false;
+            rb.useGravity = true;
+            IsTouching = 0;
+            PP.IsRunningPlane = false;
+            RightDir = transform.right;
+            InAirMouseDir = mouseDir.GetDir();
+            rb.AddForce(Normal * JumpPower);
+        }
     }
 }

@@ -69,6 +69,7 @@ public class MouseControl : MonoBehaviour
         {
             transform.localRotation = mouseDir.GetDir();
         }
+        /*
         if (!hookShooter.IsHooked)
         {
             Vector3 LerpedRight = new Vector3(transform.right.x, 0, transform.right.z).normalized;
@@ -77,6 +78,7 @@ public class MouseControl : MonoBehaviour
                             + new Vector3(0, rb.velocity.y, 0)
                                 - LerpedForward * AirVelo.z * Input.GetAxis("Horizontal");
         }
+         */
     }
     void Fall()
     {
